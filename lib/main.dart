@@ -46,6 +46,10 @@ class _TodoListState extends State<TodoList> {
     setState(() {todo.completed = !todo.completed;});
   }
 
+  void _deleteTodo(Todo todo){
+    setState((){ _todos.removeWhere((element) => element.name == todo.name);});
+  }
+
   Future<void> _displayDialog() async {
     return showDialog<void>(
         context: context,
@@ -94,7 +98,7 @@ class _TodoListState extends State<TodoList> {
       body: ListView(
         padding: const EdgeInsets.symmetric(vertical:8),
         children: _todos.map((Todo todo){
-          return TodoItem(todo:todo, onTodoChanged: _handleTodoChange);
+          return TodoItem(todo:todo, onTodoChanged: _handleTodoChange, removeTodo: _deleteTodo);
         }).toList(),
       ),
 
@@ -118,8 +122,9 @@ class Todo {
 
 class TodoItem extends StatelessWidget {
   final Todo todo;
-  TodoItem({required this.todo, required this.onTodoChanged}) : super(key:ObjectKey(todo));
-
+  TodoItem({required this.todo, required this.onTodoChanged, required this.removeTodo}) : super(key:ObjectKey(todo));
+  
+  final void Function(Todo todo) removeTodo;
   final void Function(Todo todo) onTodoChanged;
 
   TextStyle? _getTextStyle(bool checked) {
@@ -151,9 +156,10 @@ class TodoItem extends StatelessWidget {
           iconSize: 30,
           icon:const Icon(Icons.delete, color:Colors.red),
           alignment: Alignment.centerRight,
-          onPressed: () {},
+          onPressed: () { removeTodo(todo);},
         ),
       ])
     );
+    
   }
 }
